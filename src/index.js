@@ -73,24 +73,29 @@ const posts = [{
 ];
 
 const comments = [{
-        id: 1,
-        text: 'First Comment'
+        id: 101,
+        text: 'First Comment',
+        author: '11'
     },
     {
-        id: 2,
-        text: 'Second Comment'
+        id: 102,
+        text: 'Second Comment',
+        author: '12'
     },
     {
-        id: 3,
-        text: 'Third Comment'
+        id: 103,
+        text: 'Third Comment',
+        author: '12'
     },
     {
-        id: 4,
-        text: 'Fourth Comment'
+        id: 104,
+        text: 'Fourth Comment',
+        author: '13'
     },
     {
-        id: 5,
-        text: 'Fifth Comment'
+        id: 105,
+        text: 'Fifth Comment',
+        author: '11'
     },
 
 
@@ -108,6 +113,7 @@ const typeDefs = `
     type Comment {
         id: ID!
         text: String!
+        author: User!
     }
 
     type Post {
@@ -158,25 +164,26 @@ const resolvers = {
                 published: false
             }
         },
-        comments(){
-            console.log("comments -> comments", comments)
+        comments() {
             return comments
         }
     },
     Post: {
         author(parent, args, ctx, info) {
-            console.log("parent", parent)
             return users.find(user => user.id === parent.author)
         }
     },
     User: {
         posts(parent, args, ctx, info) {
-            console.log("posts -> parent", parent)
-            return posts.filter(post => {
-                if (post.author === parent.id) {
-                    console.log("posts -> post", post)
-                }
-                post.author === parent.id
+            return posts.filter(post => post.author === parent.id)
+        }
+    },
+    Comment: {
+        author(parent, arts, ctx, info) {
+            return users.find(user => {
+                console.log("author -> user", user)
+                return user.id === parent.author
+                
             })
         }
     }
