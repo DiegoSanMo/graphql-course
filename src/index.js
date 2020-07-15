@@ -70,13 +70,44 @@ const posts = [{
         published: false,
         author: '15'
     }
-]
+];
+
+const comments = [{
+        id: 1,
+        text: 'First Comment'
+    },
+    {
+        id: 2,
+        text: 'Second Comment'
+    },
+    {
+        id: 3,
+        text: 'Third Comment'
+    },
+    {
+        id: 4,
+        text: 'Fourth Comment'
+    },
+    {
+        id: 5,
+        text: 'Fifth Comment'
+    },
+
+
+];
+
 const typeDefs = `
     type Query {
         users(query: String): [User!]!
         posts(query: String): [Post!]!
+        comments: [Comment!]!
         post: Post!
         user: User!
+    }
+
+    type Comment {
+        id: ID!
+        text: String!
     }
 
     type Post {
@@ -126,6 +157,10 @@ const resolvers = {
                 body: 'This is my first description',
                 published: false
             }
+        },
+        comments(){
+            console.log("comments -> comments", comments)
+            return comments
         }
     },
     Post: {
@@ -135,14 +170,14 @@ const resolvers = {
         }
     },
     User: {
-        posts(parent, args, ctx, info){
-        console.log("posts -> parent", parent)
-        return posts.filter(post => {
-            if(post.author === parent.id){
-                console.log("posts -> post", post)
-            }
-               post.author === parent.id
-            })  
+        posts(parent, args, ctx, info) {
+            console.log("posts -> parent", parent)
+            return posts.filter(post => {
+                if (post.author === parent.id) {
+                    console.log("posts -> post", post)
+                }
+                post.author === parent.id
+            })
         }
     }
 }
