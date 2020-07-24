@@ -203,9 +203,9 @@ const resolvers = {
                 published: false
             }
         },
-        // comments() {
-        //     return comments
-        // }
+        comments() {
+            return comments
+        }
     },
     Mutation: {
         createUser(parent, args, ctx, info) {
@@ -223,6 +223,7 @@ const resolvers = {
             return user;
         },
         deleteUser(parent, args, ctx, info){
+            console.log("deleteUser -> args", args)
             const userIndex = users.findIndex( user => user.id === args.userId)
             console.log(userIndex )
             if(userIndex === -1){
@@ -233,15 +234,12 @@ const resolvers = {
 
             posts = posts.filter(post => {
                 const match = post.author === args.userId;
-                console.log("deleteUser -> match", match)
                 if(match){
                     comments = comments.filter(comment => comment.post !== post.id)
-                    console.log("deleteUser -> comments", comments)
                 }
                 return !match
             }) 
             comments = comments.filter(comment => comment.author !== args.userId)
-            console.log("deleteUser -> comments", comments)
             return deletedUsers[0];
 
         },
