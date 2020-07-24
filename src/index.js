@@ -7,7 +7,7 @@ const {
 } = require('uuidv4');
 //Definitions
 
-const users = [{
+let users = [{
         id: '11',
         name: 'Diego',
         email: "diego@hotmail.com",
@@ -41,7 +41,7 @@ const users = [{
     }
 ];
 
-const posts = [{
+let posts = [{
         id: "1",
         title: "El principito",
         body: "One of the best books",
@@ -78,7 +78,7 @@ const posts = [{
     }
 ];
 
-const comments = [{
+let comments = [{
         id: 101,
         text: 'First Comment',
         author: '11',
@@ -122,10 +122,31 @@ const typeDefs = `
     }
 
     type Mutation {
-        createUser(name: String!, email: String!, age: Int): User!
-        createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
-        createComment(text: String!, author: ID!, post:  ID!): Comment!
+        createUser(data: createUserInput!): User!
+        deleteUser(userId: ID! ):User!
+        createPost(post: createPostInput!): Post!
+        createComment(comment: createCommentInput!): Comment!
     }
+
+    input createUserInput {
+        name: String!
+        email: String!
+        age: Int
+    }
+
+    input createPostInput {
+        title: String!
+        body: String!
+        published: Boolean!
+        author: ID!
+    }
+
+    input createCommentInput {
+        text: String!
+        author: ID!
+        post: ID!
+    }
+
     type User {
         id: ID!
         name: String!
@@ -188,54 +209,65 @@ const resolvers = {
     },
     Mutation: {
         createUser(parent, args, ctx, info) {
-            const emailTaken = users.some(user => user.email === args.email)
+            const emailTaken = users.some(user => user.email === args.data.email)
             if (emailTaken) {
                 throw new Error('Email taken.')
             }
 
             const user = {
                 id: uuid(),
-                name: args.name,
-                email: args.email,
-                age: args.age
-
+                ...args.data
             }
 
             users.push(user);
             return user;
         },
+        deleteUser(parent, args, ctx, info){
+            const userIndex = users.findIndex( user => user.id === args.userId)
+            console.log(userIndex )
+            if(userIndex === -1){
+                throw new Error('User not found')
+            }
+
+            const deletedUsers = users.splice(userIndex, 1);
+
+            posts = posts.filter(post => {
+                const match = post.author === args.userId;
+                console.log("deleteUser -> match", match)
+                if(match){
+                    comments = comments.filter(comment => comment.post !== post.id)
+                    console.log("deleteUser -> comments", comments)
+                }
+                return !match
+            }) 
+            comments = comments.filter(comment => comment.author !== args.userId)
+            console.log("deleteUser -> comments", comments)
+            return deletedUsers[0];
+
+        },
         createPost(parent, args, ctx, info) {
-            const userExist = users.some(user => user.id === args.author)
+            const userExist = users.some(user => user.id === args.post.author)
             if (!userExist) {
                 throw new Error('User not found')
             }
             const post = {
                 id: uuid(),
-                title: args.title,
-                body: args.body,
-                published: args.published,
-                author: args.author
+                ...args.post
             }
             posts.push(post);
             return post;
         },
         createComment(parent, args, ctx, info) {
-            const existUser = users.some(user => user.id === args.author);
-            const existPost = posts.some(post => post.id === args.post);
+            const existUser = users.some(user => user.id === args.comment.author);
+            const existPost = posts.some(post => post.id === args.comment.post && post.published);
 
-            if (!existUser) {
-                throw new Error('User not found');
-            }
-
-            if (!existPost) {
-                throw new Error('Post not found');
+            if (!existUser || !existPost) {
+                throw new Error('Unable to find user and post');
             }
 
             const comment = {
                 id: uuid(),
-                text: args.text,
-                author: args.author,
-                post: args.post
+                ...args.comment
             }
 
             comments.push(comment);
@@ -274,5 +306,5 @@ const server = new GraphQLServer({
 })
 
 server.start(() => {
-    console.log('The app is running')
+    // // // // console.log('The app is running')
 });
