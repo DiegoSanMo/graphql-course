@@ -125,6 +125,7 @@ const typeDefs = `
         createUser(data: createUserInput!): User!
         deleteUser(userId: ID! ):User!
         createPost(post: createPostInput!): Post!
+        deletePost(postId: ID!): Post!
         createComment(comment: createCommentInput!): Comment!
     }
 
@@ -223,9 +224,7 @@ const resolvers = {
             return user;
         },
         deleteUser(parent, args, ctx, info){
-            console.log("deleteUser -> args", args)
             const userIndex = users.findIndex( user => user.id === args.userId)
-            console.log(userIndex )
             if(userIndex === -1){
                 throw new Error('User not found')
             }
@@ -254,6 +253,19 @@ const resolvers = {
             }
             posts.push(post);
             return post;
+        },
+        deletePost(parent, args, ctx, info){
+            const postIndex = posts.findIndex(post => post.id === args.postId);
+            if(postIndex === -1){
+                throw new Error('Post not found');
+            }
+
+            const postDeleted = posts.splice(postIndex, 1);
+            comments = comments.filter(comment => comment.post !== args.postId)
+            console.log("deletePost -> comments", comments)
+
+
+            return postDeleted[0];
         },
         createComment(parent, args, ctx, info) {
             const existUser = users.some(user => user.id === args.comment.author);
@@ -304,5 +316,5 @@ const server = new GraphQLServer({
 })
 
 server.start(() => {
-    // // // // console.log('The app is running')
+    console.log('The app is running')
 });
