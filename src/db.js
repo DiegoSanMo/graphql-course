@@ -70,31 +70,31 @@ const posts = [{
 ];
 
 const comments = [{
-    id: 101,
+    id: "101",
     text: 'First Comment',
     author: '11',
     post: '1'
   },
   {
-    id: 102,
+    id: "102",
     text: 'Second Comment',
     author: '12',
     post: '1'
   },
   {
-    id: 103,
+    id: "103",
     text: 'Third Comment',
     author: '12',
     post: '1'
   },
   {
-    id: 104,
+    id: "104",
     text: 'Fourth Comment',
     author: '13',
     post: '2'
   },
   {
-    id: 105,
+    id: "105",
     text: 'Fifth Comment',
     author: '11',
     post: '3'

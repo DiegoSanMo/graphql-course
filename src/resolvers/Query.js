@@ -30,7 +30,7 @@ const Query = {
       published: false
     }
   },
-  comments() {
+  comments(parent, args, { db }, info) {
     return db.comments
   }
 
